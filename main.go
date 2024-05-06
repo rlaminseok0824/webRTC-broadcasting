@@ -62,6 +62,8 @@ func wsHandler(c *websocket.Conn) {
 			Decode(message.Data, &offer, false)
 			if(isBroadcast){
 				go Broadcast(offer)
+			}else {
+				go View(offer)
 			}
 			localDescription := <- LocalDescriptionChan
 			if writeErr := c.WriteJSON(&websocketMessage{
