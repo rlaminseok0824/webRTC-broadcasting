@@ -56,6 +56,7 @@ func wsHandler(c *websocket.Conn) {
 		}
 
 		switch message.Event {
+		// Client에서는 자신의 LocalDescription을 보내고, 서버에서는 이를 바탕으로 answer를 만들고 이와 관련된 localDescription 보내 연결 설정을 한다.
 		case "offer":
 			offer := webrtc.SessionDescription{}
 			Decode(message.Data, &offer, false)
