@@ -6,6 +6,21 @@ import (
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pion/webrtc/v4"
+)
+
+var (
+	// webRTC의 기본 설정으로 default 구글 strun 서버로 ICE 서버를 설정
+	defaultPeerConnectionConfig = webrtc.Configuration{
+		ICEServers: []webrtc.ICEServer{
+			{
+				URLs: []string{"stun:stun.l.google.com:19302"},
+			},
+		},
+	}
+	trackLocals map[string]*webrtc.TrackLocalStaticRTP
+	localTrackChan = make(chan *webrtc.TrackLocalStaticRTP)
+	LocalDescriptionChan = make(chan string)
 )
 
 func main(){
@@ -27,8 +42,9 @@ func main(){
 }
 
 func wsHandler(c *websocket.Conn) {
-	// ex) ws://localhost:3000/ws/123
+	// ex) ws://localhost:3000/ws/123?isBroadcast=true
 	log.Println(c.Params("room")) //123
+	isBroadcast := (c.Query("isBroadcast") == "true") //true
 
 	message := &websocketMessage{}
 	for {
@@ -41,6 +57,11 @@ func wsHandler(c *websocket.Conn) {
 
 		switch message.Event {
 		case "offer":
+			offer := webrtc.SessionDescription{}
+			Decode(message.Data, &offer, false)
+			if(isBroadcast){
+				go Broadcast(offer)
+			}
 		case "candidate":
 		case "answer":
 		}
