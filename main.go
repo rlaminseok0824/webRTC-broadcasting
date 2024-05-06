@@ -63,6 +63,13 @@ func wsHandler(c *websocket.Conn) {
 			if(isBroadcast){
 				go Broadcast(offer)
 			}
+			localDescription := <- LocalDescriptionChan
+			if writeErr := c.WriteJSON(&websocketMessage{
+				Event : "lsp",
+				Data: localDescription,
+			}); writeErr != nil {
+				log.Println("writeErr : ", writeErr)
+			}
 		case "candidate":
 		case "answer":
 		}
