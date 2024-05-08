@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"sync"
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -10,6 +11,7 @@ import (
 )
 
 var (
+	listLock sync.RWMutex
 	// webRTC의 기본 설정으로 default 구글 strun 서버로 ICE 서버를 설정
 	defaultPeerConnectionConfig = webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
@@ -56,8 +58,8 @@ func wsHandler(c *websocket.Conn) {
 		}
 
 		switch message.Event {
-		// Client에서는 자신의 LocalDescription을 보내고, 서버에서는 이를 바탕으로 answer를 만들고 이와 관련된 localDescription 보내 연결 설정을 한다.
 		case "offer":
+			// Client에서는 자신의 LocalDescription을 보내고, 서버에서는 이를 바탕으로 answer를 만들고 이와 관련된 localDescription 보내 연결 설정을 한다.
 			offer := webrtc.SessionDescription{}
 			Decode(message.Data, &offer, false)
 			if(isBroadcast){
@@ -74,6 +76,12 @@ func wsHandler(c *websocket.Conn) {
 			}
 		case "candidate":
 		case "answer":
+		case "track":
+			// Client에서는 자신의 서버가 시작되었음을 서버에 알린다.
+			listLock.Lock()
+			localTrack := <- localTrackChan
+			trackLocals["video"] = localTrack
+			listLock.Unlock()
 		}
 	}
 }
