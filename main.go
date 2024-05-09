@@ -80,7 +80,7 @@ func wsHandler(c *websocket.Conn) {
 			// Client에서는 자신의 서버가 시작되었음을 서버에 알린다.
 			listLock.Lock()
 			localTrack := <- localTrackChan
-			trackLocals["video"] = localTrack
+			trackLocals["video"] = localTrack //임의로 video로 설정 추후 바꿈
 			listLock.Unlock()
 		}
 	}
