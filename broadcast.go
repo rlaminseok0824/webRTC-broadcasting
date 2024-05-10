@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 
 	"github.com/pion/interceptor"
 	"github.com/pion/interceptor/pkg/intervalpli"
@@ -98,7 +99,7 @@ func Broadcast(offer webrtc.SessionDescription){
 	// Channel를 통해 ICE Candidate를 전달 받음
 	// realworld에선 직접 ICE Candidate 호출 -> Future Plan
 	gatherComplete := webrtc.GatheringCompletePromise(peerConnection)
-
+	log.Println("Gathering ICE Candidates")
 	err = peerConnection.SetLocalDescription(answer)
 	if err != nil {
 		panic(err)
@@ -107,6 +108,7 @@ func Broadcast(offer webrtc.SessionDescription){
 	//ICE Candidate 정보 끝날때까지 기다림
 	<-gatherComplete
 
+	log.Println("Gathering ICE Candidates Finished")
 	//peerConnection의 LocalDescription을 전달
 	LocalDescriptionChan <- Encode(peerConnection.LocalDescription(),false)
 
