@@ -52,9 +52,14 @@ func Broadcast(offer webrtc.SessionDescription){
 		}
 	}()
 	
-	//Video Track 하나만을 받음
-	if _, err = peerConnection.AddTransceiverFromKind(webrtc.RTPCodecTypeVideo); err != nil {
-		panic(err)
+	//Video + Audio Track 하나만을 받음
+	for _, typ := range []webrtc.RTPCodecType{webrtc.RTPCodecTypeVideo, webrtc.RTPCodecTypeAudio} {
+		if _, err := peerConnection.AddTransceiverFromKind(typ, webrtc.RTPTransceiverInit{
+			Direction: webrtc.RTPTransceiverDirectionRecvonly,
+		}); err != nil {
+			log.Print(err)
+			return
+		}
 	}
 
 	//RemoteTrack이 들어오면 실행되는 함수
