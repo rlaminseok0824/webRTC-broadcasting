@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"errors"
@@ -9,6 +9,8 @@ import (
 	"github.com/pion/interceptor"
 	"github.com/pion/interceptor/pkg/intervalpli"
 	"github.com/pion/webrtc/v4"
+
+	"github.com/webRTC-broadcasting/utils"
 )
 
 
@@ -65,7 +67,7 @@ func Broadcast(offer webrtc.SessionDescription){
 	//RemoteTrack이 들어오면 실행되는 함수
 	peerConnection.OnTrack(func(remoteTrack *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) { 
 		// Create a local track, all our SFU clients will be fed via this track
-		localTrack, newTrackErr := webrtc.NewTrackLocalStaticRTP(remoteTrack.Codec().RTPCodecCapability, "video", "pion") //"video","pion"은 추후 수정 필요
+		localTrack, newTrackErr := webrtc.NewTrackLocalStaticRTP(remoteTrack.Codec().RTPCodecCapability, remoteTrack.ID(), remoteTrack.StreamID()) //"video","pion"은 추후 수정 필요
 		if newTrackErr != nil {
 			panic(newTrackErr)
 		}
@@ -115,7 +117,7 @@ func Broadcast(offer webrtc.SessionDescription){
 
 	log.Println("Gathering ICE Candidates Finished")
 	//peerConnection의 LocalDescription을 전달
-	LocalDescriptionChan <- Encode(peerConnection.LocalDescription(),false)
+	LocalDescriptionChan <- utils.Encode(peerConnection.LocalDescription(),false)
 
 	//함수가 죽지 않게 대기
 	select{}

@@ -1,6 +1,9 @@
-package main
+package handler
 
-import "github.com/pion/webrtc/v4"
+import (
+	"github.com/pion/webrtc/v4"
+	"github.com/webRTC-broadcasting/utils"
+)
 
 func View(recvOnlyOffer webrtc.SessionDescription) {
 
@@ -11,7 +14,7 @@ func View(recvOnlyOffer webrtc.SessionDescription) {
 	}
 
 	// RTCP 트랙을 받을 트랙 추가
-	rtpSender, err := peerConnection.AddTrack(trackLocals["video"]) //현재는 지정된 id로 localTrack 추가
+	rtpSender, err := peerConnection.AddTrack(TrackLocals["video"]) //현재는 지정된 id로 localTrack 추가
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +40,7 @@ func View(recvOnlyOffer webrtc.SessionDescription) {
 	<-gatherComplete
 
 
-	LocalDescriptionChan <- Encode(peerConnection.LocalDescription(), false)
+	LocalDescriptionChan <- utils.Encode(peerConnection.LocalDescription(), false)
 	
 	// RTCP 트랙을 받을 채널을 생성하고, RTCP 트랙을 받는다.
 	rtcpBuf := make([]byte, 1500)

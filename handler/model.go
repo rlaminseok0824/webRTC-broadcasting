@@ -1,4 +1,4 @@
-package main
+package handler
 
 type websocketMessage struct {
 	Event string `json:"event"`
