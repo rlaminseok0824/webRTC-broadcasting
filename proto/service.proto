@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/webRTC-broadcasting/proto";
+
+message Request {
+}
+
+message TrackLocalResponse {
+    repeated string trackIds =1;
+}
+
+service GetTrackLocalService {
+    rpc GetTrackLocal(Request) returns (TrackLocalResponse);
+}
