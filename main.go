@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/pion/webrtc/v4"
 
+	grpc_server "github.com/webRTC-broadcasting/grpc"
 	"github.com/webRTC-broadcasting/handler"
 )
 
@@ -19,6 +20,12 @@ func main(){
 	app.Use("/ws", handler.WsUpgrade)
 
 	app.Get("/ws/:room", websocket.New(handler.WsHandler))
+	
+	go func() {
+        if err := app.Listen(":3000"); err != nil {
+            log.Fatalf("failed to start Fiber server: %v", err)
+        }
+    }()
 
-	log.Fatal(app.Listen(":3000"))
+    grpc_server.StartGRPCServer()
 }
