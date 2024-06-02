@@ -5,7 +5,7 @@ import (
 	"github.com/webRTC-broadcasting/utils"
 )
 
-func View(recvOnlyOffer webrtc.SessionDescription) {
+func View(recvOnlyOffer webrtc.SessionDescription, trackID string) {
 
 	// PeerConnection 생성
 	peerConnection, err := webrtc.NewPeerConnection(defaultPeerConnectionConfig)
@@ -14,7 +14,7 @@ func View(recvOnlyOffer webrtc.SessionDescription) {
 	}
 
 	// RTCP 트랙을 받을 트랙 추가
-	rtpSender, err := peerConnection.AddTrack(TrackLocals["video"]) //현재는 지정된 id로 localTrack 추가
+	rtpSender, err := peerConnection.AddTrack(TrackLocals[trackID]) //현재는 지정된 id로 localTrack 추가
 	if err != nil {
 		panic(err)
 	}

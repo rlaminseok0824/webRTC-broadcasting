@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	listLock sync.RWMutex
-	// webRTC의 기본 설정으로 default 구글 strun 서버로 ICE 서버를 설정
+	ListLock sync.RWMutex
+	// webRTC의 기본 설정으로 default 구글 stun 서버로 ICE 서버를 설정
 	defaultPeerConnectionConfig = webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
@@ -58,7 +58,7 @@ func WsHandler(c *websocket.Conn) {
 			if(isBroadcast){
 				go Broadcast(offer)
 			}else {
-				go View(offer)
+				go View(offer,message.ID)
 			}
 			localDescription := <- LocalDescriptionChan
 			log.Println("Create Local Description Based on Offer : \n", localDescription)
@@ -72,11 +72,18 @@ func WsHandler(c *websocket.Conn) {
 		case "answer":
 		case "track":
 			// Client에서는 자신의 서버가 시작되었음을 서버에 알린다.
-			listLock.Lock()
+			ListLock.Lock()
 			localTrack := <- localTrackChan
 			TrackLocals[localTrack.ID()] = localTrack //임의로 video로 설정 추후 바꿈
-			listLock.Unlock()
+			ListLock.Unlock()
 			log.Println("Track added ", localTrack)
+
+			if writeErr := c.WriteJSON(&websocketMessage{
+				Event : "track",
+				Data: localTrack.ID(),
+			}); writeErr != nil {
+				log.Println("writeErr : ", writeErr)
+			}
 		}
 	}
 }
