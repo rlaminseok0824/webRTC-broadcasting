@@ -80,12 +80,18 @@ func Broadcast(offer webrtc.SessionDescription){
 		for {
 			i, _, readErr := remoteTrack.Read(rtpBuf)
 			if readErr != nil {
-				panic(readErr)
+				if errors.Is(readErr, io.EOF) {
+					log.Println("remoteTrack finished")
+					return
+				}
+				log.Printf("readErr: %v", readErr)
+				return
 			}
 
 			// ErrClosedPipe means we don't have any subscribers, this is ok if no peers have connected yet
 			if _, err = localTrack.Write(rtpBuf[:i]); err != nil && !errors.Is(err, io.ErrClosedPipe) {
-				panic(err)
+				log.Printf("writeErr: %v", err)
+				return
 			}
 		}
 	})
