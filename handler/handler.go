@@ -56,7 +56,7 @@ func WsHandler(c *websocket.Conn) {
 			utils.Decode(message.Data, &offer, false)
 
 			if(isBroadcast){
-				go Broadcast(offer)
+				go Broadcast(offer,message.ID)
 			}else {
 				go View(offer,message.ID)
 			}

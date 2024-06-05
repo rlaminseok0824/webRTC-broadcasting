@@ -14,7 +14,7 @@ import (
 )
 
 
-func Broadcast(offer webrtc.SessionDescription){
+func Broadcast(offer webrtc.SessionDescription, trackID string){
 	// webRTC의 정보를 보내는 broadcast peerConnection 생성
 	
 	// webRTC의 기본 미디어 코덱 엔진 등록
@@ -67,7 +67,7 @@ func Broadcast(offer webrtc.SessionDescription){
 	//RemoteTrack이 들어오면 실행되는 함수
 	peerConnection.OnTrack(func(remoteTrack *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) { 
 		// Create a local track, all our SFU clients will be fed via this track
-		localTrack, newTrackErr := webrtc.NewTrackLocalStaticRTP(remoteTrack.Codec().RTPCodecCapability, remoteTrack.ID(), remoteTrack.StreamID()) //"video","pion"은 추후 수정 필요
+		localTrack, newTrackErr := webrtc.NewTrackLocalStaticRTP(remoteTrack.Codec().RTPCodecCapability, trackID, remoteTrack.StreamID()) //"video","pion"은 추후 수정 필요
 		if newTrackErr != nil {
 			panic(newTrackErr)
 		}
